@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 // This should be the root namespace of the package
-namespace Frends.HIT.SIEParser;
+namespace Frends.HIT.SIEConverter;
 
 /// <summary>
 /// Parameters for reading SIE file

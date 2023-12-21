@@ -1,4 +1,4 @@
-﻿namespace Frends.HIT.SIEParser;
+﻿namespace Frends.HIT.SIEConverter;
 
 /// <summary>
 /// A class containing functions that can be used in the main class for repeated tasks
