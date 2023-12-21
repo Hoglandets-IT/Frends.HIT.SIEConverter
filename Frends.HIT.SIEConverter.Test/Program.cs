@@ -8,7 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 
 ReadParams rp = new ReadParams();
-rp.File = "test.si";
+
 rp.Path = "C:\\Users\\linisa005\\source\\repos\\Frends.HIT.SIEConverter\\Frends.HIT.TaskTemplate.Test2\\bin\\Debug\\net6.0";
 
 rp.IgnoreMissingOMFATTNING = true;

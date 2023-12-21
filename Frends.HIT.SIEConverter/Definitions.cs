@@ -28,46 +28,46 @@ public class ReadParams
     public string FileName { get; set; }
 
     /// <summary>
-    /// The file as a string
+    /// The file as a byte array
     /// </summary>
     [DefaultValue("")]
     [DisplayFormat(DataFormatString = "Text")]
-    public string File { get; set; }
+    public byte[] File { get; set; }
 
     /// <summary>
     /// If true the parser will not flag a missing #OMFATTN as an error
     /// </summary>
-    [DisplayFormat(DataFormatString = "Boolean")]
+    //[DisplayFormat(DataFormatString = "Boolean")]
     public bool IgnoreMissingOMFATTNING { get; set; }
 
     /// <summary>
     /// If true #BTRANS (removed voucher rows) will be ignored
     /// </summary>
-    [DisplayFormat(DataFormatString = "Boolean")]
+    //[DisplayFormat(DataFormatString = "Boolean")]
     public bool IgnoreBTRANS { get; set; }
 
     /// <summary>
     /// If true #RTRANS (added voucher rows) will be ignored
     /// </summary>
-    [DisplayFormat(DataFormatString = "Boolean")]
+    //[DisplayFormat(DataFormatString = "Boolean")]
     public bool IgnoreRTRANS { get; set; }
 
     /// <summary>
     /// If true some errors for missing dates will be ignored
     /// </summary>
-    [DisplayFormat(DataFormatString = "Boolean")]
+    //[DisplayFormat(DataFormatString = "Boolean")]
     public bool IgnoreMissingDate { get; set; }
 
     /// <summary>
     /// If true don't store values internally. The user has to use the Callback class to get the values. Usefull for large files
     /// </summary>
-    [DisplayFormat(DataFormatString = "Boolean")]
+    //[DisplayFormat(DataFormatString = "Boolean")]
     public bool StreamValues { get; set; }
 
     /// <summary>
     /// If false then cache all Exceptions in SieDocument.ValidationExceptions
     /// </summary>
-    [DisplayFormat(DataFormatString = "Boolean")]
+    //[DisplayFormat(DataFormatString = "Boolean")]
     public bool ThrowErrors { get; set; }
 
     /// <summary>

@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Frends.HIT.SIEParser;
+namespace Frends.HIT.SIEConverter;
 
-class Main
+public class Main
 {
     /// <summary>
     /// This is the information shown about the task in the Frends control panel.
@@ -18,11 +18,12 @@ class Main
     public static ReadResult ReadSIE([PropertyTab] ReadParams input)
     {
         //var file = string.Join("/", new string[] { input.Path, input.File });
-        File.WriteAllText(input.FileName, input.File);
+        File.WriteAllBytes(input.FileName, input.File);
         Encoding encoding = EncodingHelper.GetDefault();
-        if (input.Encoding != null) {
-            encoding = Encoding.GetEncoding(input.Encoding);
-        }
+        //if (input.Encoding != null)
+        //{
+        //    encoding = Encoding.GetEncoding(input.Encoding);
+        //}
         var doc = new SieDocument()
         {
             ThrowErrors = input.ThrowErrors,
