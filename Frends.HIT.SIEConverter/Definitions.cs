@@ -88,10 +88,7 @@ public class ReadParams
 /// </summary>
 public class ReadResult
 {
-    /// <summary>
-    /// The content of the read file
-    /// </summary>
-    public SieDocument Content { get; set; }
+
 
     /// <summary>
     /// The path to the file that was read
@@ -99,15 +96,22 @@ public class ReadResult
     public string Path { get; set; }
 
     /// <summary>
+    /// List of files from VER rows in SIE document
+    /// </summary>
+    public List<string> Result { get; set; }
+
+    /// <summary>
     /// Create a new ReadResult object
     /// </summary>
     public ReadResult(
-        SieDocument content,
-        string path
-    )
+        List<string> result,
+        //SieDocument content,
+        string path)
+ 
     {
-        Content = content;
+        //Content = content;
         Path = path;
+        Result = result;
     }
 }
 

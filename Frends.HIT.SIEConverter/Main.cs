@@ -18,12 +18,14 @@ public class Main
     public static ReadResult ReadSIE([PropertyTab] ReadParams input)
     {
         //var file = string.Join("/", new string[] { input.Path, input.File });
-        File.WriteAllBytes(input.FileName, input.File);
+        //File.WriteAllBytes(input.FileName, input.File);
         Encoding encoding = EncodingHelper.GetDefault();
         //if (input.Encoding != null)
         //{
         //    encoding = Encoding.GetEncoding(input.Encoding);
         //}
+
+        MemoryStream stream = Helpers.GenerateStreamFromByteArray(input.File);
         var doc = new SieDocument()
         {
             ThrowErrors = input.ThrowErrors,
@@ -35,10 +37,12 @@ public class Main
             DateFormat = input.DateFormat,
             Encoding = encoding
         };
-        doc.ReadDocument(input.FileName);
+        doc.ReadDocument(stream);
         return new ReadResult(
-            content: doc,
+            //content: doc,
+            result: Helpers.parseSIEFile(doc),
             path: string.Join("/", new string[] { input.Path, input.FileName })
+            
         );
     }
 }
