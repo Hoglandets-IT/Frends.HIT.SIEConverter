@@ -1,5 +1,6 @@
 ﻿using jsiSIE;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 
 namespace Frends.HIT.SIEConverter;
 
@@ -30,14 +31,14 @@ public class Helpers
     public static List<string> parseSIEFile(SieDocument document) 
     {
         List<string> list = new List<string>();
-        
+
         foreach (var sieVoucher in document.VER)
         {
             string result = "H ";
             var date = sieVoucher.Text.Split(' ').LastOrDefault();
             date = date.Replace("-", "");
             date = date.Remove(0, 2);
-            result = result + date + " Momentum Faktura\r\n"; //Hårdkodat, ska fixas.
+            result = result + date + " " + GetRaindanceMainText(sieVoucher.Text.ToUpper()) + "\r\n"; //Hårdkodat, ska fixas.
 
             foreach (var sieVoucherRow in sieVoucher.Rows)
             {
@@ -77,5 +78,21 @@ public class Helpers
 
         return list;
 
+    }
+
+    private static string GetRaindanceMainText(string verText) 
+    {
+        string fileType = "Momentum Faktura";
+        
+        if (verText.Contains("HYRA"))
+        {
+            fileType = "Momentum Hyra";
+        }
+        if (verText.Contains("BETALNING"))
+        {
+            fileType = "Momentum Inbetalning";
+        }
+        
+        return fileType;
     }
 }
