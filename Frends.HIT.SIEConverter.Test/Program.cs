@@ -2,6 +2,7 @@
 using jsiSIE;
 using System;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -40,7 +41,7 @@ var docA = new SieDocument()
 var docB = new SieDocument() { ThrowErrors = false, IgnoreMissingOMFATTNING = true };
 
 
-docA.ReadDocument(fileA);
+docA.ReadDocument(fileB);
 
 //docB.ReadDocument(fileB);
 
@@ -56,7 +57,15 @@ Console.WriteLine(docA.KONTO.Values.Count);
 Console.WriteLine("--------------------------------");
 
 List<string> list = new List<string>();
-
+Dictionary<string, SieDimension> dimensions = docA.DIM;
+Dictionary<string, SieAccount> konton = docA.KONTO;
+Dictionary<string, SieDimension> documentDimDictionery = docA.DIM;
+foreach (KeyValuePair<string, SieDimension> entry in dimensions)
+{
+    Console.WriteLine("Entry key:" + entry.Key);
+    Console.WriteLine("Entry value name:" + entry.Value.Name);
+    Console.WriteLine("Entry value number:" + entry.Value.Number);
+}
 
 foreach (var sieVoucher in docA.VER)
 {
@@ -64,7 +73,7 @@ foreach (var sieVoucher in docA.VER)
     var date = sieVoucher.Text.Split(' ').LastOrDefault();
     date = date.Replace("-", "");
     date = date.Remove(0, 2);
-    result = result + date + " Momentum Faktura\r\n"; //Hårdkodat, ska fixas.
+    result = result + sieVoucher.Rows[0].RowDate + " " + "Momentum" + " " + Truncate(sieVoucher.Number, 21) + "\r\n"; //Hårdkodat, ska fixas.
 
     Console.WriteLine("VER Text:" + sieVoucher.Text);
     
@@ -84,36 +93,24 @@ foreach (var sieVoucher in docA.VER)
         Console.WriteLine("VER Row Created By:" + sieVoucherRow.CreatedBy);
         Console.WriteLine("VER Row Quantity:" + sieVoucherRow.Quantity);
         Console.WriteLine("VER Row Token :" + sieVoucherRow.Token);
-        ver = ver + sieVoucherRow.Account.Number;
+        ver = ver + Truncate(sieVoucherRow.Account.Number, 10);
         ver = ver.PadRight(12);
-        //Console.WriteLine("VER Row Account Number:" + sieVoucherRow.Account.Number);
-        Console.WriteLine("VER Row Account Name:" + sieVoucherRow.Account.Name);
-        Console.WriteLine("VER Row Account Unit:" + sieVoucherRow.Account.Unit);
-        Console.WriteLine("VER Row Account Type:" + sieVoucherRow.Account.Type);
+        string dimRowString = AddRowDimensions(sieVoucherRow, documentDimDictionery);
+        ver = ver + dimRowString;
 
-        foreach (var sieObject in sieVoucherRow.Objects)
-        {
-            ver = ver + sieObject.Number;
-            ver = ver.PadRight(82);
-            Console.WriteLine("Object Name:" + sieObject.Name);
-            Console.WriteLine("Object Number:" + sieObject.Number);
-            Console.WriteLine("Object Dimension Name:" + sieObject.Dimension.Name);
-            Console.WriteLine("Object Dimension Number:" + sieObject.Dimension.Number);
-        }
         ver += "EK24";
         ver = ver.PadRight(124);
+        string amountString = sieVoucherRow.Amount.ToString().Replace(",", ".");
         if (sieVoucherRow.Amount > 0)
         {
-         
-            ver += (" " + sieVoucherRow.Amount);
-
+            ver += (" " + amountString);
         }
         else
         {
-            ver += sieVoucherRow.Amount;
+            ver += amountString;
         }
         ver = ver.PadRight(141);
-        ver += sieVoucher.Text;
+        ver += Truncate(sieVoucher.Text, 30);
         ver += "\r\n";
         result = result + ver;
     }
@@ -127,7 +124,32 @@ foreach (var result in list)
     Console.WriteLine(result);
 }
 
+static string AddRowDimensions(SieVoucherRow row, Dictionary<string, SieDimension> dictionary)
+{
+    string[] dimensions = { "20", "21", "22", "23", "24", "25", "26" };
+    string rowString = "";
+    int counter = 0;
+    foreach (string dim in dimensions)
+    {
+        SieDimension sieDimension = dictionary[dim];
+        foreach (var sieObject in row.Objects) 
+        {
+            if (sieObject.Dimension.Number == sieDimension.Number)
+            {
+                rowString = rowString + Truncate(sieObject.Number, 10);
+            }
+        }
+        counter = counter + 10;
+        rowString = rowString.PadRight(counter);
+    }
+    return rowString;
+}
 
+static string Truncate(string value, int maxLength)
+{
+    if (string.IsNullOrEmpty(value)) return value;
+    return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+}
 
 
 

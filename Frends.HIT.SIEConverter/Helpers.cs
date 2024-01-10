@@ -1,8 +1,4 @@
-﻿using jsiSIE;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-
-namespace Frends.HIT.SIEConverter;
+﻿namespace Frends.HIT.SIEConverter;
 
 /// <summary>
 /// A class containing functions that can be used in the main class for repeated tasks
@@ -10,14 +6,8 @@ namespace Frends.HIT.SIEConverter;
 public class Helpers
 {
     /// <summary>
-    /// Returns True if the task was successful
+    /// Generates MemoryStream from byte array
     /// </summary>
-    /// <returns></returns>
-    public static bool IsSuccessful()
-    {
-        return true == true;
-    }
-
     public static MemoryStream GenerateStreamFromByteArray(byte[] b)
     {
         MemoryStream stream = new MemoryStream(b);
@@ -28,71 +18,13 @@ public class Helpers
         return stream;
     }
 
-    public static List<string> parseSIEFile(SieDocument document) 
+    /// <summary>
+    /// Truncates a string to specified length
+    /// </summary>
+    public static string Truncate(string value, int maxLength)
     {
-        List<string> list = new List<string>();
-
-        foreach (var sieVoucher in document.VER)
-        {
-            string result = "H ";
-            var date = sieVoucher.Text.Split(' ').LastOrDefault();
-            date = date.Replace("-", "");
-            date = date.Remove(0, 2);
-            result = result + date + " " + GetRaindanceMainText(sieVoucher.Text.ToUpper()) + "\r\n"; //Hårdkodat, ska fixas.
-
-            foreach (var sieVoucherRow in sieVoucher.Rows)
-            {
-                string ver = "K ";
-  
-                ver = ver + sieVoucherRow.Account.Number;
-                ver = ver.PadRight(12);
-              
-
-                foreach (var sieObject in sieVoucherRow.Objects)
-                {
-                    ver = ver + sieObject.Number;
-                    ver = ver.PadRight(82);
-               
-                }
-                ver += "EK24";
-                ver = ver.PadRight(124);
-                if (sieVoucherRow.Amount > 0)
-                {
-
-                    ver += (" " + sieVoucherRow.Amount);
-
-                }
-                else
-                {
-                    ver += sieVoucherRow.Amount;
-                }
-                ver = ver.PadRight(141);
-                ver += sieVoucher.Text;
-                ver += "\r\n";
-                result = result + ver;
-            }
-
-            list.Add(result);
-
-        }
-
-        return list;
-
+        if (string.IsNullOrEmpty(value)) return value;
+        return value.Length <= maxLength ? value : value.Substring(0, maxLength);
     }
 
-    private static string GetRaindanceMainText(string verText) 
-    {
-        string fileType = "Momentum Faktura";
-        
-        if (verText.Contains("HYRA"))
-        {
-            fileType = "Momentum Hyra";
-        }
-        if (verText.Contains("BETALNING"))
-        {
-            fileType = "Momentum Inbetalning";
-        }
-        
-        return fileType;
-    }
 }
