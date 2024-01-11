@@ -3,14 +3,15 @@ using jsiSIE;
 using System;
 using System.IO;
 using System.Reflection.Metadata;
+using System.Runtime.Serialization;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
 
 
-ReadParams rp = new ReadParams();
+ParseParams rp = new ParseParams();
 
-rp.Path = "C:\\Users\\frewet001\\source\\repos\\Frends.HIT.SIEConverter\\Frends.HIT.TaskTemplate.Test2\\bin\\Debug\\net6.0";
+string path = "C:\\Users\\frewet001\\source\\repos\\Frends.HIT.SIEConverter\\Frends.HIT.TaskTemplate.Test2\\bin\\Debug\\net6.0";
 
 rp.IgnoreMissingOMFATTNING = true;
 //string readText = File.ReadAllText("BOD10003_20230823_152428.si");
@@ -22,20 +23,16 @@ var fileB = "BOD10004_20230823_152403.si";
 
 //var fileTest = "temp.si";
 Encoding encoding = EncodingHelper.GetDefault();
+rp.Encoding = "UTF-8";
 if (rp.Encoding != null)
 {
     encoding = Encoding.GetEncoding(rp.Encoding);
 }
+Console.WriteLine("Encoding: " + encoding.EncodingName);
 var docA = new SieDocument()
 {
-    ThrowErrors = rp.ThrowErrors,
-    IgnoreMissingOMFATTNING = rp.IgnoreMissingOMFATTNING,
-    IgnoreBTRANS = rp.IgnoreBTRANS,
-    IgnoreRTRANS = rp.IgnoreRTRANS,
-    IgnoreMissingDate = rp.IgnoreMissingDate,
-    StreamValues = rp.StreamValues,
-    DateFormat = rp.DateFormat,
-    Encoding = encoding
+    ThrowErrors = false,
+    IgnoreMissingDate = true
 };
 
 var docB = new SieDocument() { ThrowErrors = false, IgnoreMissingOMFATTNING = true };
@@ -73,7 +70,9 @@ foreach (var sieVoucher in docA.VER)
     var date = sieVoucher.Text.Split(' ').LastOrDefault();
     date = date.Replace("-", "");
     date = date.Remove(0, 2);
-    result = result + sieVoucher.Rows[0].RowDate + " " + "Momentum" + " " + Truncate(sieVoucher.Number, 21) + "\r\n"; //Hårdkodat, ska fixas.
+    DateTime dt = sieVoucher.Rows[0].RowDate;
+    Console.WriteLine("ROWDATE: " + dt.ToString());
+    result = result + String.Format("{0:yyMMdd}", dt) + " " + "Momentum" + " " + Truncate(sieVoucher.Number, 21) + "\r\n"; //Hårdkodat, ska fixas.
 
     Console.WriteLine("VER Text:" + sieVoucher.Text);
     

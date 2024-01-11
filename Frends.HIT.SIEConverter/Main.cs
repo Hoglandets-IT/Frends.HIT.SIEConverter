@@ -7,25 +7,22 @@ namespace Frends.HIT.SIEConverter;
 public class Main
 {
     /// <summary>
-    /// This is the information shown about the task in the Frends control panel.
-    /// The TaskInput input parameters will be shown on a different tab than the verbose option with the PropertyTab attribute.
+    /// Reads a Sie File as byte array and parses it to Raindance format
     /// </summary> 
-    /// <param name="verbose">This parameter increases the verbosity of the output</param>
-    /// <param name="input">A set of parameters for doing something in the class</param>
-    /// <returns>TaskOutput object</returns>
-    [DisplayName("Read SIE File")]
-    public static ReadResult ReadSIE([PropertyTab] ReadParams input)
+    /// <param name="input">Parse parameters</param>
+    /// <returns>ParseResult object</returns>
+    [DisplayName("Parse Momentum SIE file")]
+    public static ParseResult ReadSIE([PropertyTab] ParseParams input)
     {
-        //var file = string.Join("/", new string[] { input.Path, input.File });
-        //File.WriteAllBytes(input.FileName, input.File);
+
         Encoding encoding = EncodingHelper.GetDefault();
-        //if (input.Encoding != null)
-        //{
-        //    encoding = Encoding.GetEncoding(input.Encoding);
-        //}
+        if (input.Encoding != "")
+        {
+            encoding = Encoding.GetEncoding(input.Encoding);
+        }
 
         MemoryStream stream = Helpers.GenerateStreamFromByteArray(input.File);
-        var doc = new SieDocument()
+        var sieDoc = new SieDocument()
         {
             ThrowErrors = input.ThrowErrors,
             IgnoreMissingOMFATTNING = input.IgnoreMissingOMFATTNING,
@@ -33,19 +30,16 @@ public class Main
             IgnoreRTRANS = input.IgnoreRTRANS,
             IgnoreMissingDate = input.IgnoreMissingDate,
             StreamValues = input.StreamValues,
-            DateFormat = input.DateFormat,
             Encoding = encoding
         };
-        doc.ReadDocument(stream);
-        return new ReadResult(
-            //content: doc,
-            result: ParseSIEFile(doc),
-            path: string.Join("/", new string[] { input.Path, input.FileName })
+        sieDoc.ReadDocument(stream);
+        return new ParseResult(
+            result: MapToRaindanceFormat(sieDoc, input.DateFormat)
             
         );
     }
 
-    private static List<string> ParseSIEFile(SieDocument document)
+    private static List<string> MapToRaindanceFormat(SieDocument document, string DateFormat)
     {
         Dictionary<string, SieDimension> documentDimDictionery = document.DIM;
         List<string> list = new List<string>();
@@ -53,7 +47,10 @@ public class Main
         foreach (var sieVoucher in document.VER)
         {
             string result = "H ";
-            result = result + sieVoucher.Rows[0].RowDate + " " + "Momentum" + " " + Helpers.Truncate(sieVoucher.Number, 21) + "\r\n"; //Hårdkodat, ska fixas.
+
+            DateTime dt = sieVoucher.Rows[0].RowDate;
+            string date = String.Format("{0:" + DateFormat + "}", dt);
+            result = result + date + " " + "Momentum" + " " + Helpers.Truncate(sieVoucher.Number, 21) + "\r\n"; //Hårdkodat, ska fixas.
 
             foreach (var sieVoucherRow in sieVoucher.Rows)
             {
